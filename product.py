@@ -6,3 +6,8 @@ class Product:
         self.price = price
         self.stock = stock
         self.category = category
+
+    def __str__(self):
+        return (f"[{self.product_id}] {self.name} ({self.category})\n"
+                f"  Description: {self.description}\n"
+                f"  Price: ${self.price:.2f} | Stock: {self.stock}")

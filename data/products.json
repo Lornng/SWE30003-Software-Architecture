@@ -1,0 +1,26 @@
+[
+  {
+    "product_id": 1,
+    "name": "Laptop Pro 15",
+    "description": "15-inch display, 16GB RAM, 512GB SSD",
+    "price": 1799.99,
+    "stock": 8,
+    "category": "Computers"
+  },
+  {
+    "product_id": 2,
+    "name": "Smartphone X",
+    "description": "6.5-inch, 128GB, Dual SIM, 5G",
+    "price": 999.99,
+    "stock": 15,
+    "category": "Phones"
+  },
+  {
+    "product_id": 3,
+    "name": "Wireless Headphones",
+    "description": "Noise-cancelling, Bluetooth 5.2",
+    "price": 249.99,
+    "stock": 20,
+    "category": "Accessories"
+  }
+]
