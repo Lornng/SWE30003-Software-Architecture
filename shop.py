@@ -53,8 +53,9 @@ class Shop:
         self.customers.append(customer)
 
     def find_customer_by_email(self, email):
+        email = email.lower()
         for customer in self.customers:
-            if customer.email == email:
+            if customer.email.lower() == email:
                 return customer
         return None
 
@@ -125,4 +126,8 @@ class Shop:
         with open("data/products.json", "w") as f:
             json.dump([vars(p) for p in self.products], f, indent=2)
         # Repeat for customers, admins, orders
+        
+        # Save customers
+        with open("data/customers.json", "w") as f:
+            json.dump([vars(c) for c in self.customers], f, indent=2)
 
