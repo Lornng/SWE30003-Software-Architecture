@@ -1,0 +1,278 @@
+{
+    "products": [
+      {
+        "productID": "P001",
+        "name": "Wireless Bluetooth Headphones",
+        "price": 89.99,
+        "description": "Noise-canceling over-ear headphones with 30hr battery",
+        "brand": "Sony",
+        "quantity": 50,
+        "category": "Audio"
+      },
+      {
+        "productID": "P002",
+        "name": "4K Smart TV 55-inch",
+        "price": 699.99,
+        "description": "Android TV with Dolby Vision and HDR10",
+        "brand": "Samsung",
+        "quantity": 25,
+        "category": "Televisions"
+      },
+      {
+        "productID": "P003",
+        "name": "Gaming Laptop",
+        "price": 1499.99,
+        "description": "RTX 4070, 16GB RAM, 1TB SSD",
+        "brand": "ASUS",
+        "quantity": 15,
+        "category": "Laptops"
+      },
+      {
+        "productID": "P004",
+        "name": "Smartwatch Series 8",
+        "price": 299.99,
+        "description": "Blood oxygen & ECG monitoring, GPS",
+        "brand": "Apple",
+        "quantity": 40,
+        "category": "Wearables"
+      },
+      {
+        "productID": "P005",
+        "name": "Wireless Mechanical Keyboard",
+        "price": 129.99,
+        "description": "RGB backlit, Cherry MX switches",
+        "brand": "Logitech",
+        "quantity": 35,
+        "category": "Accessories"
+      },
+      {
+        "productID": "P006",
+        "name": "External SSD 1TB",
+        "price": 109.99,
+        "description": "USB-C 3.2 Gen 2, 1050MB/s read",
+        "brand": "SanDisk",
+        "quantity": 60,
+        "category": "Storage"
+      },
+      {
+        "productID": "P007",
+        "name": "Noise Canceling Earbuds",
+        "price": 199.99,
+        "description": "True wireless with ANC",
+        "brand": "Bose",
+        "quantity": 30,
+        "category": "Audio"
+      },
+      {
+        "productID": "P008",
+        "name": "27-inch 4K Monitor",
+        "price": 349.99,
+        "description": "IPS panel, 99% sRGB",
+        "brand": "LG",
+        "quantity": 20,
+        "category": "Monitors"
+      },
+      {
+        "productID": "P009",
+        "name": "Mirrorless Camera",
+        "price": 1299.99,
+        "description": "24.2MP 4K video camera",
+        "brand": "Sony",
+        "quantity": 10,
+        "category": "Cameras"
+      },
+      {
+        "productID": "P010",
+        "name": "Wi-Fi 6 Router",
+        "price": 199.99,
+        "description": "AX5400 Dual-Band Mesh Router",
+        "brand": "TP-Link",
+        "quantity": 40,
+        "category": "Networking"
+      },
+      {
+        "productID": "P011",
+        "name": "Electric Toothbrush",
+        "price": 79.99,
+        "description": "6 modes with pressure sensor",
+        "brand": "Oral-B",
+        "quantity": 100,
+        "category": "Personal Care"
+      },
+      {
+        "productID": "P012",
+        "name": "Portable Power Bank",
+        "price": 49.99,
+        "description": "20000mAh with PD 30W",
+        "brand": "Anker",
+        "quantity": 75,
+        "category": "Accessories"
+      },
+      {
+        "productID": "P013",
+        "name": "Robot Vacuum Cleaner",
+        "price": 399.99,
+        "description": "Lidar navigation, self-empty base",
+        "brand": "iRobot",
+        "quantity": 15,
+        "category": "Home Appliances"
+      },
+      {
+        "productID": "P014",
+        "name": "Wireless Security Camera",
+        "price": 129.99,
+        "description": "2K resolution with AI detection",
+        "brand": "Arlo",
+        "quantity": 25,
+        "category": "Security"
+      },
+      {
+        "productID": "P015",
+        "name": "Gaming Mouse",
+        "price": 69.99,
+        "description": "16,000 DPI optical sensor",
+        "brand": "Razer",
+        "quantity": 50,
+        "category": "Accessories"
+      },
+      {
+        "productID": "P016",
+        "name": "Bluetooth Speaker",
+        "price": 119.99,
+        "description": "360° sound with IPX7 waterproof",
+        "brand": "JBL",
+        "quantity": 40,
+        "category": "Audio"
+      },
+      {
+        "productID": "P017",
+        "name": "Fitness Tracker",
+        "price": 89.99,
+        "description": "24/7 heart rate monitoring",
+        "brand": "Fitbit",
+        "quantity": 60,
+        "category": "Wearables"
+      },
+      {
+        "productID": "P018",
+        "name": "E-Reader",
+        "price": 139.99,
+        "description": "300ppi glare-free display",
+        "brand": "Amazon",
+        "quantity": 30,
+        "category": "Tablets"
+      },
+      {
+        "productID": "P019",
+        "name": "NAS Storage 4TB",
+        "price": 499.99,
+        "description": "2-bay network attached storage",
+        "brand": "Synology",
+        "quantity": 10,
+        "category": "Storage"
+      },
+      {
+        "productID": "P020",
+        "name": "Curved Gaming Monitor",
+        "price": 449.99,
+        "description": "32-inch 1440p 165Hz",
+        "brand": "MSI",
+        "quantity": 15,
+        "category": "Monitors"
+      },
+      {
+        "productID": "P021",
+        "name": "Drone with Camera",
+        "price": 599.99,
+        "description": "4K60fps video, 3-axis gimbal",
+        "brand": "DJI",
+        "quantity": 8,
+        "category": "Drones"
+      },
+      {
+        "productID": "P022",
+        "name": "Smart Thermostat",
+        "price": 149.99,
+        "description": "Wi-Fi enabled with voice control",
+        "brand": "Nest",
+        "quantity": 25,
+        "category": "Smart Home"
+      },
+      {
+        "productID": "P023",
+        "name": "Wireless Charging Pad",
+        "price": 29.99,
+        "description": "15W fast charging for Qi devices",
+        "brand": "Belkin",
+        "quantity": 80,
+        "category": "Accessories"
+      },
+      {
+        "productID": "P024",
+        "name": "Action Camera",
+        "price": 299.99,
+        "description": "4K HDR video with stabilization",
+        "brand": "GoPro",
+        "quantity": 20,
+        "category": "Cameras"
+      },
+      {
+        "productID": "P025",
+        "name": "3D Printer",
+        "price": 399.99,
+        "description": "FDM printer with auto-leveling",
+        "brand": "Creality",
+        "quantity": 12,
+        "category": "3D Printing"
+      }
+    ],
+    "orders": [
+      {
+        "orderID": "ORD1001",
+        "userID": "U001",
+        "date": "2023-10-05",
+        "status": "Delivered",
+        "items": [
+          {"productID": "P001", "quantity": 1},
+          {"productID": "P012", "quantity": 2}
+        ],
+        "totalAmount": 229.97
+      },
+      {
+        "orderID": "ORD1002",
+        "userID": "U002",
+        "date": "2023-10-06",
+        "status": "Processing",
+        "items": [
+          {"productID": "P003", "quantity": 1},
+          {"productID": "P015", "quantity": 1}
+        ],
+        "totalAmount": 1569.98
+      },
+      {
+        "orderID": "ORD1003",
+        "userID": "U003",
+        "date": "2023-10-07",
+        "status": "Shipped",
+        "items": [
+          {"productID": "P007", "quantity": 1},
+          {"productID": "P023", "quantity": 3}
+        ],
+        "totalAmount": 289.96
+      }
+    ],
+    "admins": [
+      {
+        "adminID": "ADM001",
+        "username": "admin_john",
+        "password": "secureHash123!",
+        "email": "john.admin@store.com"
+      },
+      {
+        "adminID": "ADM002",
+        "username": "admin_sarah",
+        "password": "sarahHash456@",
+        "email": "sarah.admin@store.com"
+      }
+    ]
+  }
