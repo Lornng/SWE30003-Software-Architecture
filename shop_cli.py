@@ -265,11 +265,10 @@ class ShopCLI:
     def add_to_cart_prompt(self, allowed_products = None):
         while True:
             choice = input("\nWould you like to add a product to cart? (y/n): ").strip().lower()
-            if choice == 'y':
-                 while True:
-                    self.add_multiple_products_to_cart(allowed_products)
-                    break
-            elif choice == 'n':
+            if choice == 'n':
+                break
+            elif choice == 'y':
+                self.add_multiple_products_to_cart(allowed_products)
                 break
             else:
                 print("\nPlease enter 'y' or 'n'.")
@@ -503,3 +502,19 @@ class ShopCLI:
             self.current_customer.update_address(address)
 
         print("\nProfile updated successfully!")
+        
+
+    def view_order_history(self):
+        orders = self.shop.list_orders_by_customer(self.current_customer)
+        if not orders:
+            print("\nNo orders found.")
+            return
+        
+        print("\n--- Order History ---")
+        for order in orders:
+            print(order)
+            print("-" * 50)
+            
+            
+            
+            
