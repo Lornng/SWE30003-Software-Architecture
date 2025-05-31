@@ -84,7 +84,7 @@
     "name": "Bluetooth Earbuds Pro",
     "description": "True wireless, IPX7 waterproof, 24hr battery",
     "price": 119.99,
-    "stock": 42,
+    "stock": 38,
     "category": "Accessories"
   },
   {
@@ -100,7 +100,7 @@
     "name": "Gaming Phone Z",
     "description": "144Hz AMOLED, 8GB RAM, 6000mAh battery",
     "price": 899.0,
-    "stock": 11,
+    "stock": 7,
     "category": "Phones"
   },
   {
@@ -116,7 +116,7 @@
     "name": "Workstation Desktop",
     "description": "Intel Xeon 16-core, 64GB RAM, 2TB SSD",
     "price": 3299.99,
-    "stock": 3,
+    "stock": 5,
     "category": "Computers"
   }
 ]

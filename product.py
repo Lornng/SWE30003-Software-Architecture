@@ -11,3 +11,13 @@ class Product:
         return (f"[{self.product_id}] {self.name} ({self.category})\n"
                 f"  Description: {self.description}\n"
                 f"  Price: ${self.price:.2f} | Stock: {self.stock}")
+
+    # Check if the stock is available
+    def is_in_stock(self, quantity):
+        return self.stock >= quantity
+
+    def update_stock(self, quantity):
+        if quantity <= self.stock:
+            self.stock -= quantity
+            return True
+        return False

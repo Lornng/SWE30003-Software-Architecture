@@ -1,5 +1,7 @@
 from cart import Cart
 from customer import Customer
+from datetime import datetime
+import random
 import re
 
 class ShopCLI:
@@ -488,7 +490,79 @@ class ShopCLI:
                 print("\nInvalid input. Please enter a number.")
                 
                 
-    # Need to add function to proceed to checkout
+    # ----------------Checkout Order ---------------
+    def checkout(self):
+        """Handle the checkout process including payment method selection"""
+        # Check if cart is empty
+        if not self.cart.items:
+            print("Your cart is empty. Nothing to checkout.")
+            return
+        
+        # Display available payment methods
+        payment_methods = ["Credit Card", "PayPal", "Bank Transfer", "Cash on Delivery"]
+        print("\n--- Available Payment Methods ---")
+        for i, method in enumerate(payment_methods, 1):
+            print(f"{i}. {method}")
+        
+        # Get payment method selection
+        payment_method = None
+        while payment_method is None:
+            try:
+                choice = input("\nSelect payment method (1-4): ").strip()
+                if choice.lower() == 'exit':
+                    print("Checkout cancelled.")
+                    return
+                    
+                choice_num = int(choice)
+                if 1 <= choice_num <= len(payment_methods):
+                    payment_method = payment_methods[choice_num-1]
+                else:
+                    print(f"Please enter a number between 1 and {len(payment_methods)}")
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+        
+        # Display cart summary
+        total = sum(product.price * qty for product, qty in self.cart.items.items())
+        print("\n--- Order Summary ---")
+        print("Items in your cart:")
+        for product, qty in self.cart.items.items():
+            print(f"- {product.name} x {qty}: ${product.price * qty:.2f}")
+        print(f"\nTotal: ${total:.2f}")
+        print(f"Shipping to: {self.current_customer.address}")
+        print(f"Payment Method: {payment_method}")
+        
+        # Get final confirmation
+        confirm = input("\nConfirm checkout? (y/n): ").strip().lower()
+        if confirm != 'y':
+            print("Checkout cancelled.")
+            return
+        
+        # Process the order
+        try:
+            order = self.shop.place_order(
+                customer=self.current_customer,
+                cart=self.cart,
+                payment_method=payment_method
+            )
+            
+            if order:
+                if order.status == "Confirmed":
+                    print("\n✅ Order confirmed! Thank you for your purchase.")
+                    print(f"Order ID: {order.order_id}")
+                    print(f"Payment ID: {order.payment.payment_id}")
+                    print(f"Tracking Number: {order.delivery.tracking_number}")
+                    print(f"Estimated Delivery: {order.delivery.estimated_delivery.strftime('%Y-%m-%d')}")
+                elif order.status == "Payment Failed":
+                    print("\n❌ Payment failed. Please try a different payment method.")
+                    # Keep items in cart for retry
+                else:
+                    print(f"\nOrder status: {order.status}")
+            else:
+                print("\nFailed to place order. Please try again.")
+        except Exception as e:
+            print(f"\nError during checkout: {str(e)}")
+            # Keep items in cart for retry
+            print("Your items have been kept in the cart for your next attempt.")
     
     def update_profile(self):
         print("\n--- Update Profile ---")
