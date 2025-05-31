@@ -1,18 +1,18 @@
 [
   {
-    "user_id": 1,
+    "user_id": "ADM001",
     "name": "Admin One",
     "email": "a",
     "password": "a"
   },
   {
-    "user_id": 2,
+    "user_id": "ADM002",
     "name": "Admin Two",
     "email": "admin2@estore.com",
     "password": "adminpass2"
   },
   {
-    "user_id": 3,
+    "user_id": "ADM003",
     "name": "Admin Three",
     "email": "admin3@estore.com",
     "password": "adminpass3"

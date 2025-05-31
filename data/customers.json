@@ -1,6 +1,6 @@
 [
   {
-    "user_id": 1,
+    "user_id": "U001",
     "name": "Alice Smith",
     "email": "alice@example.com",
     "password": "alice123",
@@ -8,7 +8,7 @@
     "orders": []
   },
   {
-    "user_id": 2,
+    "user_id": "U002",
     "name": "Bob Lee",
     "email": "bob@example.com",
     "password": "bob123",
@@ -16,7 +16,7 @@
     "orders": []
   },
   {
-    "user_id": 3,
+    "user_id": "U003",
     "name": "Carol Chen",
     "email": "carol@example.com",
     "password": "carol123",
