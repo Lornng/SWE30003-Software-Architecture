@@ -1,5 +1,6 @@
 from cart import Cart
 from customer import Customer
+import re
 
 class ShopCLI:
     def __init__(self, shop):
@@ -31,24 +32,98 @@ class ShopCLI:
 
     def login(self):
         print("\n--- Customer Login ---")
-        email = input("Email: ").strip()
-        password = input("Password: ").strip()
+        print("\nType 'exit' at any prompt to cancel login.")
+         
+        # Email prompt
+        while True:
+            email = input("\nEmail: ").strip()
+            if email.lower() == 'exit':
+                print("\nLogin cancelled.")
+                return
+            if not email:
+                print("\nEmail is required.")
+                continue
+            break
         
+        # Password prompt
+        while True:
+            password = input("\nPassword: ").strip()
+            if password.lower() == 'exit':
+                print("\nLogin cancelled.")
+                return
+            if not password:
+                print("\nPassword is required.")
+                continue
+            break
+        
+        # Authenticate user
         customer = self.shop.find_customer_by_email(email)
         if customer and customer.password == password:
             self.current_customer = customer
             print(f"Welcome back, {customer.name}!")
         else:
-            print("Invalid email or password. Please try again.")
+            print("\nInvalid email or password. Please try again.")
 
     def register(self):
         print("\n--- Customer Registration ---")
+        print("\nType 'exit' at any prompt to cancel registration.")
         try:
-            name = input("Full Name: ").strip()
-            email = input("Email: ").strip()
-            password = input("Password: ").strip()
-            address = input("Address: ").strip()
+            # Full Name prompt and format validation
+            while True:
+                name = input("\nFull Name: ").strip()
+                name_pattern = r"^[A-Za-z\s'-]+$"
+                if name.lower() == 'exit':
+                    print("\nRegistration cancelled.")
+                    return
+                if not name:
+                    print("\nName is required.")
+                    continue
+                if not re.match(name_pattern, name):
+                    print("\nFull Name can only contain letters, spaces, hyphens(-), or apostrophes(').")
+                    continue
+                break
             
+            # Email prompt and format validation
+            while True: 
+                email = input("\nEmail: ").strip()
+                email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+                if email.lower() == 'exit':
+                    print("\nRegistration cancelled.")
+                    return
+                if not email:
+                    print("\nEmail is required.")
+                    continue
+                # Email format validation
+                elif not re.match(email_pattern, email):
+                    print("\nInvalid email format. Please try again.")
+                    continue
+                break
+            
+            # Prompt for password and check minimum length
+            while True:
+                password = input("\nPassword: ").strip()
+                if password.lower() == 'exit':
+                    print("\nRegistration cancelled.")
+                    return
+                if not password:
+                    print("\nPassword is required.")
+                    continue
+                elif len(password) < 6:
+                    print("\nPassword must be at least 6 characters long.")
+                    continue
+                break
+            
+            # Address Prompt
+            while True:
+                address = input("\nAddress: ").strip()
+                if address.lower() == 'exit':
+                    print("\nRegistration cancelled.")
+                    return
+                if not address: 
+                    print("\nAddress is required.")
+                    continue
+                break
+                
             # Check if email already exists
             if self.shop.find_customer_by_email(email):
                 print("Email already registered. Please use a different email.")
