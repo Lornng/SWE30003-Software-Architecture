@@ -132,7 +132,17 @@ class ShopCLI:
                 return
             
             # Generate new user ID
-            user_id = max([c.user_id for c in self.shop.customers], default=0) + 1
+            existing_ids = []
+            for customer in self.shop.customers:
+                if isinstance(customer.user_id, str) and customer.user_id.startswith('U'):
+                    try:
+                        num_part = int(customer.user_id[1:])
+                        existing_ids.append(num_part)
+                    except ValueError:
+                        continue
+                    
+            next_id_num = max(existing_ids, default=0) + 1
+            user_id = f"U{next_id_num:03d}"
             
             # Create new customer
             new_customer = Customer(user_id, name, email, password, address)
@@ -259,7 +269,7 @@ class ShopCLI:
             else: 
                 print("Invalid selection.")
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("Invalid input. Please enter a Product ID.")
             
     
     def add_to_cart_prompt(self, allowed_products = None):
@@ -293,8 +303,8 @@ class ShopCLI:
                 if product_id_input.lower() == 'exit':
                     print("\nAdd item to cart cancelled.")
                     return
-                
-                product_id = int(product_id_input)
+               
+                product_id = product_id_input.upper()
                 product = self.shop.find_product_by_id(product_id)
                 
                 if not product:
@@ -503,7 +513,7 @@ class ShopCLI:
 
         print("\nProfile updated successfully!")
         
-
+        
     def view_order_history(self):
         orders = self.shop.list_orders_by_customer(self.current_customer)
         if not orders:
@@ -514,7 +524,3 @@ class ShopCLI:
         for order in orders:
             print(order)
             print("-" * 50)
-            
-            
-            
-            
