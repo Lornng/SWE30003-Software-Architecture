@@ -22,5 +22,15 @@
     "password": "carol123",
     "address": "789 King St, Brisbane",
     "orders": []
+  },
+  {
+    "user_id": "U004",
+    "name": "Test",
+    "email": "Test",
+    "password": "Test",
+    "address": "789 King St, Brisbane",
+    "orders": [
+      "ORD0004"
+    ]
   }
 ]

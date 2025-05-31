@@ -1,5 +1,7 @@
 from cart import Cart
 from customer import Customer
+from datetime import datetime
+import random
 import re
 
 class ShopCLI:
@@ -132,7 +134,17 @@ class ShopCLI:
                 return
             
             # Generate new user ID
-            user_id = max([c.user_id for c in self.shop.customers], default=0) + 1
+            existing_ids = []
+            for customer in self.shop.customers:
+                if isinstance(customer.user_id, str) and customer.user_id.startswith('U'):
+                    try:
+                        num_part = int(customer.user_id[1:])
+                        existing_ids.append(num_part)
+                    except ValueError:
+                        continue
+                    
+            next_id_num = max(existing_ids, default=0) + 1
+            user_id = f"U{next_id_num:03d}"
             
             # Create new customer
             new_customer = Customer(user_id, name, email, password, address)
@@ -259,7 +271,7 @@ class ShopCLI:
             else: 
                 print("Invalid selection.")
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("Invalid input. Please enter a valid Product ID.")
             
     
     def add_to_cart_prompt(self, allowed_products = None):
@@ -293,15 +305,15 @@ class ShopCLI:
                 if product_id_input.lower() == 'exit':
                     print("\nAdd item to cart cancelled.")
                     return
-                
-                product_id = int(product_id_input)
+               
+                product_id = product_id_input.upper()
                 product = self.shop.find_product_by_id(product_id)
                 
                 if not product:
                     print("\nProduct not found. Please try again.")
                     continue
                 
-                if allowed_products and product not in allowed_products:
+                if allowed_products and not any(p.product_id == product.product_id for p in allowed_products):
                     print("\nProduct not available in this view. Please select a valid product.")
                     continue
                 
@@ -478,7 +490,79 @@ class ShopCLI:
                 print("\nInvalid input. Please enter a number.")
                 
                 
-    # Need to add function to proceed to checkout
+    # ----------------Checkout Order ---------------
+    def checkout(self):
+        """Handle the checkout process including payment method selection"""
+        # Check if cart is empty
+        if not self.cart.items:
+            print("Your cart is empty. Nothing to checkout.")
+            return
+        
+        # Display available payment methods
+        payment_methods = ["Credit Card", "PayPal", "Bank Transfer", "Cash on Delivery"]
+        print("\n--- Available Payment Methods ---")
+        for i, method in enumerate(payment_methods, 1):
+            print(f"{i}. {method}")
+        
+        # Get payment method selection
+        payment_method = None
+        while payment_method is None:
+            try:
+                choice = input("\nSelect payment method (1-4): ").strip()
+                if choice.lower() == 'exit':
+                    print("Checkout cancelled.")
+                    return
+                    
+                choice_num = int(choice)
+                if 1 <= choice_num <= len(payment_methods):
+                    payment_method = payment_methods[choice_num-1]
+                else:
+                    print(f"Please enter a number between 1 and {len(payment_methods)}")
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+        
+        # Display cart summary
+        total = sum(product.price * qty for product, qty in self.cart.items.items())
+        print("\n--- Order Summary ---")
+        print("Items in your cart:")
+        for product, qty in self.cart.items.items():
+            print(f"- {product.name} x {qty}: ${product.price * qty:.2f}")
+        print(f"\nTotal: ${total:.2f}")
+        print(f"Shipping to: {self.current_customer.address}")
+        print(f"Payment Method: {payment_method}")
+        
+        # Get final confirmation
+        confirm = input("\nConfirm checkout? (y/n): ").strip().lower()
+        if confirm != 'y':
+            print("Checkout cancelled.")
+            return
+        
+        # Process the order
+        try:
+            order = self.shop.place_order(
+                customer=self.current_customer,
+                cart=self.cart,
+                payment_method=payment_method
+            )
+            
+            if order:
+                if order.status == "Confirmed":
+                    print("\n✅ Order confirmed! Thank you for your purchase.")
+                    print(f"Order ID: {order.order_id}")
+                    print(f"Payment ID: {order.payment.payment_id}")
+                    print(f"Tracking Number: {order.delivery.tracking_number}")
+                    print(f"Estimated Delivery: {order.delivery.estimated_delivery.strftime('%Y-%m-%d')}")
+                elif order.status == "Payment Failed":
+                    print("\n❌ Payment failed. Please try a different payment method.")
+                    # Keep items in cart for retry
+                else:
+                    print(f"\nOrder status: {order.status}")
+            else:
+                print("\nFailed to place order. Please try again.")
+        except Exception as e:
+            print(f"\nError during checkout: {str(e)}")
+            # Keep items in cart for retry
+            print("Your items have been kept in the cart for your next attempt.")
     
     def update_profile(self):
         print("\n--- Update Profile ---")
@@ -503,7 +587,7 @@ class ShopCLI:
 
         print("\nProfile updated successfully!")
         
-
+        
     def view_order_history(self):
         orders = self.shop.list_orders_by_customer(self.current_customer)
         if not orders:
@@ -514,7 +598,3 @@ class ShopCLI:
         for order in orders:
             print(order)
             print("-" * 50)
-            
-            
-            
-            

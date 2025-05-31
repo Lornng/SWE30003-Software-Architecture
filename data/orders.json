@@ -6,16 +6,38 @@
       "name": "Alice Smith",
       "email": "alice@example.com",
       "password": "alice123",
-      "address": "123 Main St, Melbourne",
-      "order_history": []
+      "address": "123 Main St, Melbourne"
     },
     "items": [
-      {"product_id": "P001", "quantity": 1},
-      {"product_id": "P003", "quantity": 2}
+      {
+        "product_id": "P001",
+        "quantity": 1
+      },
+      {
+        "product_id": "P003",
+        "quantity": 2
+      }
     ],
-    "total_price": 2299.97,
     "status": "Completed",
-    "order_date": "2025-05-20T14:30:00"
+    "order_date": "2025-05-20T14:30:00",
+    "total_price": 2299.97,
+    "payment": {
+      "payment_id": "PAY1001",
+      "order_id": "ORD1001",
+      "amount": 2299.97,
+      "method": "Credit Card",
+      "status": "Completed",
+      "transaction_date": "2025-05-20T14:32:15"
+    },
+    "delivery": {
+      "delivery_id": "DLV1001",
+      "order_id": "ORD1001",
+      "address": "123 Main St, Melbourne",
+      "method": "Express",
+      "status": "Delivered",
+      "tracking_number": "TN1234567890",
+      "estimated_delivery": "2025-05-22T00:00:00"
+    }
   },
   {
     "order_id": "ORD1002",
@@ -25,14 +47,34 @@
       "email": "bob@example.com",
       "password": "bob123",
       "address": "456 Queen St, Sydney",
-      "order_history": []
+      "orders": []
     },
     "items": [
-      {"product_id": "P002", "quantity": 1}
+      {
+        "product_id": "P002",
+        "quantity": 1
+      }
     ],
-    "total_price": 999.99,
     "status": "Pending",
-    "order_date": "2025-05-21T10:00:00"
+    "order_date": "2025-05-21T10:00:00",
+    "total_price": 999.99,
+    "payment": {
+      "payment_id": "PAY1002",
+      "order_id": "ORD1002",
+      "amount": 999.99,
+      "method": "PayPal",
+      "status": "Pending",
+      "transaction_date": "2025-05-21T10:01:30"
+    },
+    "delivery": {
+      "delivery_id": "DLV1002",
+      "order_id": "ORD1002",
+      "address": "456 Queen St, Sydney",
+      "method": "Standard",
+      "status": "Processing",
+      "tracking_number": "TN0987654321",
+      "estimated_delivery": "2025-05-24T00:00:00"
+    }
   },
   {
     "order_id": "ORD1003",
@@ -42,13 +84,72 @@
       "email": "carol@example.com",
       "password": "carol123",
       "address": "789 King St, Brisbane",
-      "order_history": []
+      "orders": []
     },
     "items": [
-      {"product_id": "P003", "quantity": 1}
+      {
+        "product_id": "P003",
+        "quantity": 1
+      }
     ],
-    "total_price": 249.99,
     "status": "Shipped",
-    "order_date": "2025-05-22T16:45:00"
+    "order_date": "2025-05-22T16:45:00",
+    "total_price": 249.99,
+    "payment": {
+      "payment_id": "PAY1003",
+      "order_id": "ORD1003",
+      "amount": 249.99,
+      "method": "Credit Card",
+      "status": "Completed",
+      "transaction_date": "2025-05-22T16:47:22"
+    },
+    "delivery": {
+      "delivery_id": "DLV1003",
+      "order_id": "ORD1003",
+      "address": "789 King St, Brisbane",
+      "method": "Express",
+      "status": "In Transit",
+      "tracking_number": "TN1122334455",
+      "estimated_delivery": "2025-05-24T00:00:00"
+    }
+  },
+  {
+    "order_id": "ORD0004",
+    "customer": {
+      "user_id": "U004",
+      "name": "Test",
+      "email": "Test",
+      "password": "Test",
+      "address": "789 King St, Brisbane",
+      "orders": [
+        "ORD0004"
+      ]
+    },
+    "items": [
+      {
+        "product_id": "P011",
+        "quantity": 1
+      }
+    ],
+    "status": "Confirmed \ud83d\udcb8",
+    "order_date": "2025-05-31T22:12:05.135052",
+    "total_price": 119.99,
+    "payment": {
+      "payment_id": "DLV0004",
+      "order_id": "ORD0004",
+      "amount": 119.99,
+      "method": "Cash on Delivery",
+      "status": "Completed",
+      "transaction_date": "2025-05-31T22:12:05.135052"
+    },
+    "delivery": {
+      "delivery_id": "DLV0004",
+      "order_id": "ORD0004",
+      "address": "789 King St, Brisbane",
+      "method": "Standard",
+      "status": "Processing",
+      "tracking_number": "TN866638268816",
+      "estimated_delivery": "2025-06-05T22:12:05.135052"
+    }
   }
 ]
