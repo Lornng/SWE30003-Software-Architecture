@@ -1,14 +1,14 @@
 [
   {
-    "product_id": 1,
+    "product_id": "P001",
     "name": "Laptop Pro 15",
     "description": "15-inch display, 16GB RAM, 512GB SSD",
     "price": 1799.99,
     "stock": 8,
-    "category": "Computers"
+    "category": "Laptops"
   },
   {
-    "product_id": 2,
+    "product_id": "P002",
     "name": "Smartphone X",
     "description": "6.5-inch, 128GB, Dual SIM, 5G",
     "price": 999.99,
@@ -16,11 +16,107 @@
     "category": "Phones"
   },
   {
-    "product_id": 3,
+    "product_id": "P003",
     "name": "Wireless Headphones",
     "description": "Noise-cancelling, Bluetooth 5.2",
     "price": 249.99,
     "stock": 20,
     "category": "Accessories"
+  },
+  {
+    "product_id": "P004",
+    "name": "ROG Laptop",
+    "description": "A gaming laptop with high specs",
+    "price": 2500.0,
+    "stock": 4,
+    "category": "Laptops"
+  },
+  {
+    "product_id": "P005",
+    "name": "Wireless Mechanical Keyboard",
+    "description": "RGB backlit, Cherry MX switches",
+    "price": 129.99,
+    "stock": 35,
+    "category": "Accessories"
+  },
+  {
+    "product_id": "P006",
+    "name": "4K Ultra HD Monitor",
+    "description": "32-inch IPS panel, HDR 400",
+    "price": 429.99,
+    "stock": 12,
+    "category": "Monitors"
+  },
+  {
+    "product_id": "P007",
+    "name": "Portable SSD 1TB",
+    "description": "USB 3.2 Gen 2, 1050MB/s read speed",
+    "price": 129.95,
+    "stock": 30,
+    "category": "Storage"
+  },
+  {
+    "product_id": "P008",
+    "name": "Fitness Tracker V5",
+    "description": "Heart rate monitor, waterproof, 14-day battery",
+    "price": 79.50,
+    "stock": 25,
+    "category": "Wearables"
+  },
+  {
+    "product_id": "P009",
+    "name": "Gaming Mouse Pro",
+    "description": "Wireless, 25K DPI, 8 programmable buttons",
+    "price": 89.99,
+    "stock": 18,
+    "category": "Accessories"
+  },
+  {
+    "product_id": "P010",
+    "name": "Tablet Mini",
+    "description": "8.3-inch retina display, 256GB storage",
+    "price": 649.00,
+    "stock": 9,
+    "category": "Tablets"
+  },
+    {
+    "product_id": "P011",
+    "name": "Bluetooth Earbuds Pro",
+    "description": "True wireless, IPX7 waterproof, 24hr battery",
+    "price": 119.99,
+    "stock": 42,
+    "category": "Accessories"
+  },
+  {
+    "product_id": "P012",
+    "name": "Ultrabook Air",
+    "description": "13.3-inch 4K touchscreen, 1.2kg, 18hr battery",
+    "price": 1499.00,
+    "stock": 7,
+    "category": "Laptops"
+  },
+  {
+    "product_id": "P013",
+    "name": "Gaming Phone Z",
+    "description": "144Hz AMOLED, 8GB RAM, 6000mAh battery",
+    "price": 899.00,
+    "stock": 11,
+    "category": "Phones"
+  },
+  {
+    "product_id": "P014",
+    "name": "Monitor Arm Mount",
+    "description": "Dual adjustable arms, cable management",
+    "price": 89.95,
+    "stock": 27,
+    "category": "Accessories"
+  },
+  {
+    "product_id": "P015",
+    "name": "Workstation Desktop",
+    "description": "Intel Xeon 16-core, 64GB RAM, 2TB SSD",
+    "price": 3299.99,
+    "stock": 3,
+    "category": "Computers"
   }
 ]

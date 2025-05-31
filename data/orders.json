@@ -1,52 +1,52 @@
 [
   {
-    "order_id": 1,
+    "order_id": "ORD1001",
     "customer": {
-      "user_id": 1,
+      "user_id": "U001",
       "name": "Alice Smith",
       "email": "alice@example.com",
       "password": "alice123",
       "address": "123 Main St, Melbourne",
       "order_history": []
     },
-    "items": {
-      "1": 1,
-      "3": 2
-    },
+    "items": [
+      {"product_id": "P001", "quantity": 1},
+      {"product_id": "P003", "quantity": 2}
+    ],
     "total_price": 2299.97,
     "status": "Completed",
     "order_date": "2025-05-20T14:30:00"
   },
   {
-    "order_id": 2,
+    "order_id": "ORD1002",
     "customer": {
-      "user_id": 2,
+      "user_id": "U002",
       "name": "Bob Lee",
       "email": "bob@example.com",
       "password": "bob123",
       "address": "456 Queen St, Sydney",
       "order_history": []
     },
-    "items": {
-      "2": 1
-    },
+    "items": [
+      {"product_id": "P002", "quantity": 1}
+    ],
     "total_price": 999.99,
     "status": "Pending",
     "order_date": "2025-05-21T10:00:00"
   },
   {
-    "order_id": 3,
+    "order_id": "ORD1003",
     "customer": {
-      "user_id": 3,
+      "user_id": "U003",
       "name": "Carol Chen",
       "email": "carol@example.com",
       "password": "carol123",
       "address": "789 King St, Brisbane",
       "order_history": []
     },
-    "items": {
-      "3": 1
-    },
+    "items": [
+      {"product_id": "P003", "quantity": 1}
+    ],
     "total_price": 249.99,
     "status": "Shipped",
     "order_date": "2025-05-22T16:45:00"
