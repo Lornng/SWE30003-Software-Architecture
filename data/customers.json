@@ -4,20 +4,23 @@
     "name": "Alice Smith",
     "email": "alice@example.com",
     "password": "alice123",
-    "address": "123 Main St, Melbourne"
+    "address": "123 Main St, Melbourne",
+    "orders": []
   },
   {
     "user_id": 2,
     "name": "Bob Lee",
     "email": "bob@example.com",
     "password": "bob123",
-    "address": "456 Queen St, Sydney"
+    "address": "456 Queen St, Sydney",
+    "orders": []
   },
   {
     "user_id": 3,
     "name": "Carol Chen",
     "email": "carol@example.com",
     "password": "carol123",
-    "address": "789 King St, Brisbane"
+    "address": "789 King St, Brisbane",
+    "orders": []
   }
 ]

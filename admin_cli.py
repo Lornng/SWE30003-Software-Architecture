@@ -70,15 +70,43 @@ class AdminCLI:
     def add_product(self):
         print("\n--- Add New Product ---")
         try:
-            name = input("Product name: ").strip()
-            description = input("Description: ").strip()
-            price = float(input("Price: ").strip())
-            stock = int(input("Stock quantity: ").strip())
-            category = input("Category: ").strip()
-            product_id = max([p.product_id for p in self.shop.products], default=0) + 1
-            product = Product(product_id, name, description, price, stock, category)
-            self.shop.add_product(product)
-            print("Product added successfully.")
+            name = input("Product name (or 'exit' to cancel): ").strip()
+            if name.lower() == 'exit':
+                print("Add product cancelled.")
+                return
+            description = input("Description (or 'exit' to cancel): ").strip()
+            if description.lower() == 'exit':
+                print("Add product cancelled.")
+                return
+            price_input = input("Price (or 'exit' to cancel): ").strip()
+            if price_input.lower() == 'exit':
+                print("Add product cancelled.")
+                return
+            price = float(price_input)
+            stock_input = input("Stock quantity (or 'exit' to cancel): ").strip()
+            if stock_input.lower() == 'exit':
+                print("Add product cancelled.")
+                return
+            stock = int(stock_input)
+            category = input("Category (or 'exit' to cancel): ").strip()
+            if category.lower() == 'exit':
+                print("Add product cancelled.")
+                return
+
+            print("\nPlease confirm the following product details:")
+            print(f"Name: {name}")
+            print(f"Description: {description}")
+            print(f"Price: ${price:.2f}")
+            print(f"Stock: {stock}")
+            print(f"Category: {category}")
+            confirm = input("Add this product? (y/n): ").strip().lower()
+            if confirm == 'y':
+                product_id = max([p.product_id for p in self.shop.products], default=0) + 1
+                product = Product(product_id, name, description, price, stock, category)
+                self.shop.add_product(product)
+                print("Product added successfully.")
+            else:
+                print("Add product cancelled.")
         except ValueError:
             print("Invalid input. Please enter correct values.")
 
@@ -86,21 +114,56 @@ class AdminCLI:
         print("\n--- Modify Product ---")
         self.list_products()
         try:
-            pid = int(input("Enter Product ID to modify: ").strip())
+            pid_input = input("Enter Product ID to modify (or 'exit' to cancel): ").strip()
+            if pid_input.lower() == 'exit':
+                print("Modify product cancelled.")
+                return
+            pid = int(pid_input)
             product = self.shop.find_product_by_id(pid)
             if not product:
                 print("Product not found.")
                 return
-            print("Leave blank to keep current value.")
-            name = input(f"New name [{product.name}]: ").strip() or product.name
-            description = input(f"New description [{product.description}]: ").strip() or product.description
+            print("Leave blank to keep current value. Type 'exit' to cancel.")
+            name = input(f"New name [{product.name}]: ").strip()
+            if name.lower() == 'exit':
+                print("Modify product cancelled.")
+                return
+            description = input(f"New description [{product.description}]: ").strip()
+            if description.lower() == 'exit':
+                print("Modify product cancelled.")
+                return
             price_input = input(f"New price [{product.price}]: ").strip()
-            price = float(price_input) if price_input else product.price
+            if price_input.lower() == 'exit':
+                print("Modify product cancelled.")
+                return
             stock_input = input(f"New stock [{product.stock}]: ").strip()
-            stock = int(stock_input) if stock_input else product.stock
-            category = input(f"New category [{product.category}]: ").strip() or product.category
-            self.shop.modify_product(pid, name=name, description=description, price=price, stock=stock, category=category)
-            print("Product updated successfully.")
+            if stock_input.lower() == 'exit':
+                print("Modify product cancelled.")
+                return
+            category = input(f"New category [{product.category}]: ").strip()
+            if category.lower() == 'exit':
+                print("Modify product cancelled.")
+                return
+
+            new_name = name or product.name
+            new_description = description or product.description
+            new_price = float(price_input) if price_input else product.price
+            new_stock = int(stock_input) if stock_input else product.stock
+            new_category = category or product.category
+
+            print("\nPlease confirm the following changes:")
+            print(f"Name: {new_name}")
+            print(f"Description: {new_description}")
+            print(f"Price: ${new_price:.2f}")
+            print(f"Stock: {new_stock}")
+            print(f"Category: {new_category}")
+            confirm = input("Apply these changes? (y/n): ").strip().lower()
+            if confirm == 'y':
+                self.shop.modify_product(pid, name=new_name, description=new_description,
+                                        price=new_price, stock=new_stock, category=new_category)
+                print("Product updated successfully.")
+            else:
+                print("Modify product cancelled.")
         except ValueError:
             print("Invalid input.")
 
@@ -108,13 +171,28 @@ class AdminCLI:
         print("\n--- Delete Product ---")
         self.list_products()
         try:
-            pid = int(input("Enter Product ID to delete: ").strip())
-            if self.shop.delete_product(pid):
-                print("Product deleted successfully.")
-            else:
+            pid_input = input("Enter Product ID to delete (or 'exit' to cancel): ").strip()
+            if pid_input.lower() == 'exit':
+                print("Delete product cancelled.")
+                return
+            pid = int(pid_input)
+            product = self.shop.find_product_by_id(pid)
+            if not product:
                 print("Product not found.")
+                return
+            print("\nPlease confirm deletion of the following product:")
+            print(product)
+            confirm = input("Delete this product? (y/n): ").strip().lower()
+            if confirm == 'y':
+                if self.shop.delete_product(pid):
+                    print("Product deleted successfully.")
+                else:
+                    print("Product not found.")
+            else:
+                print("Delete product cancelled.")
         except ValueError:
             print("Invalid input.")
+
 
     def list_products(self):
         print("\n--- Product List ---")
