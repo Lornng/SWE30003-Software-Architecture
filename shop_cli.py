@@ -269,7 +269,7 @@ class ShopCLI:
             else: 
                 print("Invalid selection.")
         except ValueError:
-            print("Invalid input. Please enter a Product ID.")
+            print("Invalid input. Please enter a valid Product ID.")
             
     
     def add_to_cart_prompt(self, allowed_products = None):
@@ -311,7 +311,7 @@ class ShopCLI:
                     print("\nProduct not found. Please try again.")
                     continue
                 
-                if allowed_products and product not in allowed_products:
+                if allowed_products and not any(p.product_id == product.product_id for p in allowed_products):
                     print("\nProduct not available in this view. Please select a valid product.")
                     continue
                 
