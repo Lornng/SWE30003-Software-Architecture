@@ -25,10 +25,11 @@ class ShopCLI:
                 elif choice == "3":
                     break
                 else:
-                    print("\nInvalid option. Please choose 1, 2, or 3.")
+                    print("\nInvalid choice. Please enter a number between 1 and 3.")
             else:
                 # Show main customer menu
                 self.customer_menu()
+                
 
     def login(self):
         print("\n--- Customer Login ---")
@@ -63,6 +64,7 @@ class ShopCLI:
             print(f"Welcome back, {customer.name}!")
         else:
             print("\nInvalid email or password. Please try again.")
+            
 
     def register(self):
         print("\n--- Customer Registration ---")
@@ -140,6 +142,7 @@ class ShopCLI:
             
         except Exception as e:
             print(f"Registration failed: {e}")
+            
 
     def customer_menu(self):
         while True:
@@ -174,7 +177,8 @@ class ShopCLI:
                 self.cart.clear()
                 break
             else:
-                print("\nInvalid choice. Please enter a number between 1 to 7.")
+                print("\nInvalid choice. Please enter a number between 1 and 8.")
+                
                 
     # Browse products
     def browse_products(self):
@@ -189,7 +193,8 @@ class ShopCLI:
             print(product)
             print("-" * 50)
             
-        self.add_to_cart_prompt()
+        self.add_to_cart_prompt(products)
+        
             
     # Search for products
     def search_products(self):
@@ -216,32 +221,73 @@ class ShopCLI:
                     print(product)
                     print("-" * 50)
                     
-                self.add_to_cart_prompt()
+                self.add_to_cart_prompt(products)
                 print("\n--- Search again or type 'exit' to leave ---\n")
                 
+                
+    # Browse products by category
+    def browse_by_category(self):
+        print("\n--- Browse products by Category ---")
+        
+        # Get all categories
+        categories = list(set(p.category for p in self.shop.products))
+        
+        if not categories:
+            print("\nCategories not available.")
+            return
+        
+        print("\nCategories List:")
+        for i, category in enumerate(categories, 1):
+            print(f"{i}. {category}")
+            
+        try:
+            choice = int(input("\nPlease select a category number: ").strip())
+            if 1 <= choice <= len(categories):
+                selected_category = categories[choice - 1]
+                products = self.shop.list_products_by_category(selected_category)
+                
+                if not products:
+                    print(f"\nNo product found in {selected_category} category.")
+                    return
+                
+                print(f"\n--- Products in {selected_category} ---")
+                for i, product in enumerate(products, 1):
+                    print(f"{i}. {product}")
+                    print("-" * 50)
+                    
+                self.add_to_cart_prompt(products)
+            else: 
+                print("Invalid selection.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+            
     
-    def add_to_cart_prompt(self):
+    def add_to_cart_prompt(self, allowed_products = None):
         while True:
             choice = input("\nWould you like to add a product to cart? (y/n): ").strip().lower()
             if choice == 'y':
                  while True:
-                    self.add_to_cart()
-                    again = input("\nWould you like to add another product? (y/n): ").strip().lower()
-                    if again == 'y':
-                        continue
-                    elif again == 'n':
-                        break
-                    else:
-                        print("\nInvalid input. Returning to main menu.")
-                        break
-                 break
+                    self.add_multiple_products_to_cart(allowed_products)
+                    break
             elif choice == 'n':
                 break
             else:
                 print("\nPlease enter 'y' or 'n'.")
+                
+                
+    def add_multiple_products_to_cart(self, allowed_products):
+        while True:
+            self.add_to_cart(allowed_products)
+            again = input("\nWould you like to add another product? (y/n): ").strip().lower()
+            if again == 'y':
+                continue
+            elif again == 'n':
+                break
+            else:
+                print("\nInvalid input. Returning to main menu.")
+                break
             
-            
-    def add_to_cart(self):
+    def add_to_cart(self, allowed_products = None):
         while True:
             try: 
                 product_id_input = input("\nPlease enter Product ID to add to cart (or type 'exit' to cancel): ").strip()
@@ -256,11 +302,15 @@ class ShopCLI:
                     print("\nProduct not found. Please try again.")
                     continue
                 
+                if allowed_products and product not in allowed_products:
+                    print("\nProduct not available in this view. Please select a valid product.")
+                    continue
+                
                 while True:
                     quantity_input = input(f"\nEnter quantity for '{product.name}' (stock: {product.stock}) (or type 'exit' to cancel): ").strip()
                     
                     if quantity_input.lower() == 'exit':
-                        print(f"\nAdd {product.name}to cart cancelled")
+                        print(f"\nAdd {product.name} to cart cancelled")
                         return
                     
                     try:
