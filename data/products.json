@@ -59,7 +59,7 @@
     "product_id": "P008",
     "name": "Fitness Tracker V5",
     "description": "Heart rate monitor, waterproof, 14-day battery",
-    "price": 79.50,
+    "price": 79.5,
     "stock": 25,
     "category": "Wearables"
   },
@@ -75,11 +75,11 @@
     "product_id": "P010",
     "name": "Tablet Mini",
     "description": "8.3-inch retina display, 256GB storage",
-    "price": 649.00,
+    "price": 649.0,
     "stock": 9,
     "category": "Tablets"
   },
-    {
+  {
     "product_id": "P011",
     "name": "Bluetooth Earbuds Pro",
     "description": "True wireless, IPX7 waterproof, 24hr battery",
@@ -91,7 +91,7 @@
     "product_id": "P012",
     "name": "Ultrabook Air",
     "description": "13.3-inch 4K touchscreen, 1.2kg, 18hr battery",
-    "price": 1499.00,
+    "price": 1499.0,
     "stock": 7,
     "category": "Laptops"
   },
@@ -99,7 +99,7 @@
     "product_id": "P013",
     "name": "Gaming Phone Z",
     "description": "144Hz AMOLED, 8GB RAM, 6000mAh battery",
-    "price": 899.00,
+    "price": 899.0,
     "stock": 11,
     "category": "Phones"
   },

@@ -35,9 +35,10 @@ class Shop:
 
     def find_product_by_id(self, product_id):
         for product in self.products:
-            if product.product_id == product_id:
+            if str(product.product_id).lower() == str(product_id).lower():
                 return product
         return None
+
 
     def list_products(self):
         return self.products
@@ -92,8 +93,10 @@ class Shop:
         return self.orders
 
     def list_orders_by_customer(self, customer):
-        return [order for order in self.orders if order.customer['user_id'] == customer.user_id]
-
+            return [
+        order for order in self.orders
+        if str(order.customer['user_id']).lower() == str(customer.user_id).lower()
+    ]
 
     # ---------- Load/Save Data ----------
     def load_data(self):

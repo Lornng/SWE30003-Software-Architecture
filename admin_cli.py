@@ -93,7 +93,15 @@ class AdminCLI:
                 print("Add product cancelled.")
                 return
 
+            existing_ids = [
+                int(p.product_id[1:]) for p in self.shop.products
+                if isinstance(p.product_id, str) and p.product_id.startswith('P') and p.product_id[1:].isdigit()
+            ]
+            next_id_num = max(existing_ids, default=0) + 1
+            product_id = f"P{next_id_num:03d}"
+
             print("\nPlease confirm the following product details:")
+            print(f"ID: {product_id}")
             print(f"Name: {name}")
             print(f"Description: {description}")
             print(f"Price: ${price:.2f}")
@@ -101,7 +109,6 @@ class AdminCLI:
             print(f"Category: {category}")
             confirm = input("Add this product? (y/n): ").strip().lower()
             if confirm == 'y':
-                product_id = max([p.product_id for p in self.shop.products], default=0) + 1
                 product = Product(product_id, name, description, price, stock, category)
                 self.shop.add_product(product)
                 print("Product added successfully.")
@@ -109,6 +116,7 @@ class AdminCLI:
                 print("Add product cancelled.")
         except ValueError:
             print("Invalid input. Please enter correct values.")
+
 
     def modify_product(self):
         print("\n--- Modify Product ---")
@@ -118,7 +126,7 @@ class AdminCLI:
             if pid_input.lower() == 'exit':
                 print("Modify product cancelled.")
                 return
-            pid = int(pid_input)
+            pid = pid_input
             product = self.shop.find_product_by_id(pid)
             if not product:
                 print("Product not found.")
@@ -175,7 +183,7 @@ class AdminCLI:
             if pid_input.lower() == 'exit':
                 print("Delete product cancelled.")
                 return
-            pid = int(pid_input)
+            pid = pid_input
             product = self.shop.find_product_by_id(pid)
             if not product:
                 print("Product not found.")
