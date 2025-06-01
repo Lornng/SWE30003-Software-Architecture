@@ -15,7 +15,8 @@ class AdminCLI:
             print("1. Manage Products")
             print("2. View Customer Orders")
             print("3. Generate Sales Report")
-            print("4. Logout")
+            print("4. Manage Deliveries")
+            print("5. Logout")
             choice = input("Select an option: ").strip()
 
             if choice == "1":
@@ -25,6 +26,8 @@ class AdminCLI:
             elif choice == "3":
                 self.generate_sales_report()
             elif choice == "4":
+                self.manage_deliveries() 
+            elif choice == "5":
                 print("Logging out of admin account.")
                 self.current_admin = None
                 break
@@ -247,3 +250,143 @@ class AdminCLI:
             print(f"Total sales: ${total_sales:.2f}")
         except ValueError:
             print("Invalid date format.")
+            
+            
+    def manage_deliveries(self):
+        while True:
+            print("\n--- Delivery Management ---")
+            print("1. View All Deliveries")
+            print("2. Search Delivery to Update Status")
+            print("3. Back to Admin Menu")
+            choice = input("Select an option: ").strip()
+
+            if choice == "1":
+                self.view_all_deliveries()
+            elif choice == "2":
+                self.search_delivery_update_status()
+            elif choice == "3":
+                break
+            else:
+                print("\nInvalid choice. Please enter 1-3.")
+
+    def view_all_deliveries(self):
+        print("\n--- All Deliveries ---")
+        
+        deliveries = []
+        for order in self.shop.orders:
+            if hasattr(order, 'delivery') and order.delivery:
+                deliveries.append((order.order_id, order.delivery))
+        
+        if not deliveries:
+            print("\nNo deliveries found.")
+            return
+        
+        print(f"{'Order ID':<12} {'Tracking_No':<15} {'Status':<15} {'Method':<12} {'Address':<30}")
+        print("-" * 90)
+        
+        for order_id, delivery in deliveries:
+            print(f"{order_id:<12} {delivery.tracking_number:<15} {delivery.status:<15} "
+                f"{delivery.method:<12} {delivery.address[:30]:<30}")
+
+    def search_delivery_update_status(self):
+        print("\n--- Search Delivery To Update Status ---")
+        while True:
+            search_term = input("\nEnter tracking number or order ID (or type 'exit' to cancel): ").strip()
+            
+            if not search_term:
+                print("\nSearch term cannot be empty.")
+                continue
+            if search_term.lower() == 'exit':
+                print("\nReturn to delivery Managment menu...")
+                return
+            
+            found_deliveries = []
+            
+            for order in self.shop.orders:
+                if hasattr(order, 'delivery') and order.delivery:
+                    # Search by tracking number or order ID
+                    if (search_term.upper() in order.delivery.tracking_number.upper() or 
+                        search_term.upper() in order.order_id.upper()):
+                        found_deliveries.append((order, order.delivery))
+            
+            if not found_deliveries:
+                print(f"\nNo deliveries found matching '{search_term}'")
+                continue
+            
+            print(f"\nFound {len(found_deliveries)} delivery(s):")
+            print("-" * 80)
+            
+            for i, (order, delivery) in enumerate(found_deliveries, 1):
+                print(f"\n{i}. Order ID: {order.order_id}")
+                print(f"   Tracking Number: {delivery.tracking_number}")
+                print(f"   Current Status: {delivery.status}")
+                print(f"   Method: {delivery.method}")
+                print(f"   Address: {delivery.address}")
+                print(f"   Estimated Delivery: {delivery.estimated_delivery}")
+            
+            # Option to update status of found delivery
+            if len(found_deliveries) == 1:
+                choice = input(f"\nUpdate status for this delivery? (y/n): ").strip().lower()
+                if choice == 'y':
+                    self.update_specific_delivery_status(found_deliveries[0][1])
+            elif len(found_deliveries) > 1:
+                try:
+                    choice = input(f"\nSelect delivery to update (1-{len(found_deliveries)}) or 0 to cancel: ").strip()
+                    choice_num = int(choice)
+                    if 1 <= choice_num <= len(found_deliveries):
+                        self.update_specific_delivery_status(found_deliveries[choice_num-1][1])
+                    elif choice_num != 0:
+                        print("\nInvalid selection.")
+                except ValueError:
+                    print("\nInvalid input. Please select enter a number")
+
+
+    def update_specific_delivery_status(self, delivery):
+        """Update status for a specific delivery"""
+        print(f"\n--- Update Status for Tracking #{delivery.tracking_number} ---")
+        print(f"Current Status: {delivery.status}")
+        
+        # Valid status options
+        valid_statuses = ["Processing", "Shipped", "In Transit", "Out for Delivery", "Delivered", "Delayed"]
+        
+        print("\nAvailable Status Options:")
+        for i, status in enumerate(valid_statuses, 1):
+            print(f"{i}. {status}")
+        
+        try:
+            choice = input(f"\nSelect new status (1-{len(valid_statuses)}) or 0 to cancel: ").strip()
+            choice_num = int(choice)
+            
+            if choice_num == 0:
+                print("Status update cancelled.")
+                return
+            elif 1 <= choice_num <= len(valid_statuses):
+                new_status = valid_statuses[choice_num-1]
+                
+                # Confirm the change
+                print(f"\nConfirm status change:")
+                print(f"From: {delivery.status}")
+                print(f"To:   {new_status}")
+                
+                confirm = input("Proceed with update? (y/n): ").strip().lower()
+                if confirm == 'y':
+                    try:
+                        delivery.update_status(new_status)
+                        print(f"\n Delivery status updated successfully!")
+                        print(f"Tracking #{delivery.tracking_number} is now: {new_status}")
+                        
+                        # Save changes to file
+                        self.shop.save_data()
+                        print("Changes saved to database.")
+                        
+                    except ValueError as e:
+                        print(f"Error updating status: {e}")
+                else:
+                    print("Status update cancelled.")
+            else:
+                print("Invalid selection.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+                
+                
+        
