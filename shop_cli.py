@@ -618,7 +618,40 @@ class ShopCLI:
             print("-" * 50)
             
     
-    def logout(self):
+    
+    def request_refund(self):
+        print("\n--- Request Refund ---")
+        orders = self.shop.list_orders_by_customer(self.current_customer)
+
+        eligible_orders = [o for o in orders if o.status not in ("Refunded", "Cancelled")]
+        if not eligible_orders:
+            print("No orders eligible for refund.")
+            return
+
+        print("\nEligible Orders:")
+        for idx, order in enumerate(eligible_orders, start=1):
+            print(f"{idx}. Order ID: {order.order_id} | Status: {order.status} | Total: ${order.total_price:.2f}")
+
+        try:
+            choice = input("\nEnter the number of the order to refund (or type 'exit' to cancel): ").strip()
+            if choice.lower() == "exit":
+                print("Refund request cancelled.")
+                return
+
+            idx = int(choice) - 1
+            if 0 <= idx < len(eligible_orders):
+                order = eligible_orders[idx]
+                order.update_status("Refunded")
+                if order.payment:
+                    order.payment.status = "Refunded"
+                print(f"✅ Refund processed for Order ID: {order.order_id}")
+                self.shop.save_data()
+            else:
+                print("Invalid selection.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+
+def logout(self):
         print("Logging out...")
         self.current_customer = None
         self.cart.clear() 
