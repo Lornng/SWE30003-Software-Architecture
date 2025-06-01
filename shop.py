@@ -1,11 +1,11 @@
 import json
 import os
+import re
 from product import Product
 from customer import Customer
 from admin import Admin
 from order import Order
 from delivery import Delivery
-from order import Order
 from datetime import datetime
 from payment import Payment
 
@@ -51,10 +51,70 @@ class Shop:
 
     def list_products_by_category(self, category):
         return [p for p in self.products if p.category.lower() == category.lower()]
+    
+    def get_product_categories(self):
+        return list(set(p.category for p in self.products))
 
     # ---------- Customer Management ----------
-    def register_customer(self, customer):
-        self.customers.append(customer)
+    def validate_name(self, name):
+        name_pattern = r"^[A-Za-z\s'-]+$"
+        if not re.match(name_pattern, name):
+            return False, "Full Name can only contain letters, spaces, hyphens(-), or apostrophes(')."
+        
+        return True, ""
+    
+    def validate_email_for_register(self, email):
+        # Check format
+        email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not re.match(email_pattern, email):
+            return False, "Invalid email format. Please try again."
+        
+        # Check if already exists
+        if self.find_customer_by_email(email):
+            return False, "Email already taken. Please try a different email."
+        
+        return True, ""
+    
+    def validate_email_for_update(self, email, current_user_id):
+        # Check format
+        email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not re.match(email_pattern, email):
+            return False, "Invalid email format. Please try again."
+        
+        # Check if taken by another customer
+        existing_customer = self.find_customer_by_email(email)
+        if existing_customer and existing_customer.user_id != current_user_id:
+            return False, "Email already taken by another customer. Try again or leave blank to keep current."
+        
+        return True, ""
+    
+    def validate_password(self, password):      
+        if len(password) < 6:
+            return False, "Password must be at least 6 characters long."
+        
+        return True, ""
+    
+    def existing_customer_email(self, email, current_user_id):
+        existing_customer = self.find_customer_by_email(email)
+        return existing_customer and existing_customer.user_id != current_user_id
+
+    
+    def register_customer(self, customer_data):
+        name, email, password, address = customer_data
+        
+        # Generate customer IDs
+        user_id = f"U{len(self.customers) + 1:03d}" 
+        
+        # Create and add customer
+        new_customer = Customer(user_id, name.strip(), email.strip(), password, address.strip())
+        self.customers.append(new_customer)
+        return True, "Customer registered successfully."
+    
+    def authenticate_customer(self, email, password):
+        customer = self.find_customer_by_email(email)
+        if customer and customer.password == password:
+            return customer
+        return None
 
     def find_customer_by_email(self, email):
         email = email.lower()
@@ -65,6 +125,20 @@ class Shop:
 
     def list_customers(self):
         return self.customers
+    
+    def update_customer_profile(self, customer, profile_data):
+        try:
+            if profile_data['name'] is not None:
+                customer.name = profile_data['name']
+            if profile_data['email'] is not None:
+                customer.email = profile_data['email']
+            if profile_data['password'] is not None:
+                customer.password = profile_data['password']
+            if profile_data['address'] is not None:
+                customer.address = profile_data['address']
+            return True, "Profile updated successfully"
+        except Exception as e:
+            return False, str(e)
 
     # ---------- Admin Management ----------
     def add_admin(self, admin):
@@ -80,19 +154,6 @@ class Shop:
         return self.admins
 
     # ---------- Order Management ----------
-    def place_order(self, customer, cart, payment_method):
-        # Create a new order with payment and delivery processing
-
-        for product, qty in cart.items.items():
-            if not product.is_in_stock(qty):
-                return None
-        for product, qty in cart.items.items():
-            product.update_stock(qty)
-        order = Order(len(self.orders) + 1, customer, cart.items)
-        self.orders.append(order)
-        customer.add_order(order)
-        cart.clear()
-        return order
 
     def list_orders(self):
         return self.orders
@@ -103,7 +164,7 @@ class Shop:
         if str(order.customer['user_id']).lower() == str(customer.user_id).lower()
     ]
 
-# ---------------Create an order from the cart contents------------------
+    # ---------------Create an order from the cart contents------------------
     def place_order(self, customer, cart, payment_method):
         # First check stock for all items in cart
         for product, quantity in cart.items.items():
