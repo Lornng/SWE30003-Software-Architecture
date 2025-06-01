@@ -2,7 +2,7 @@ from cart import Cart
 from customer import Customer
 from datetime import datetime
 import random
-import re
+
 
 class ShopCLI:
     def __init__(self, shop):
@@ -36,7 +36,21 @@ class ShopCLI:
     def login(self):
         print("\n--- Customer Login ---")
         print("\nType 'exit' at any prompt to cancel login.")
-         
+        
+        credentials = self.get_login_credentials()
+        if not credentials:
+            return
+            
+        email, password = credentials
+        
+        # Authenticate user
+        customer = self.shop.authenticate_customer(email, password)
+        if customer:
+            self.current_customer = customer
+        else:
+            print("\nInvalid email or password. Please try again.")
+            
+    def get_login_credentials(self):
         # Email prompt
         while True:
             email = input("\nEmail: ").strip()
@@ -58,39 +72,44 @@ class ShopCLI:
                 print("\nPassword is required.")
                 continue
             break
-        
-        # Authenticate user
-        customer = self.shop.find_customer_by_email(email)
-        if customer and customer.password == password:
-            self.current_customer = customer
-            print(f"Welcome back, {customer.name}!")
-        else:
-            print("\nInvalid email or password. Please try again.")
             
+        return email, password
 
     def register(self):
         print("\n--- Customer Registration ---")
         print("\nType 'exit' at any prompt to cancel registration.")
+        
+        user_data = self.get_register_data()
+        if not user_data:
+            return
+        
+        success, message = self.shop.register_customer(user_data)
+        if success:
+            print("\nRegistration successful! You can now login.")
+        else:
+            print(f"\nRegistration failed: {message}")
+            
+        
+    def get_register_data(self):
         try:
             # Full Name prompt and format validation
             while True:
                 name = input("\nFull Name: ").strip()
-                name_pattern = r"^[A-Za-z\s'-]+$"
                 if name.lower() == 'exit':
                     print("\nRegistration cancelled.")
                     return
                 if not name:
                     print("\nName is required.")
                     continue
-                if not re.match(name_pattern, name):
-                    print("\nFull Name can only contain letters, spaces, hyphens(-), or apostrophes(').")
+                is_valid, error_msg = self.shop.validate_name(name)
+                if not is_valid:
+                    print(f"\n{error_msg}")
                     continue
                 break
             
             # Email prompt and format validation
             while True: 
                 email = input("\nEmail: ").strip()
-                email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
                 if email.lower() == 'exit':
                     print("\nRegistration cancelled.")
                     return
@@ -98,8 +117,9 @@ class ShopCLI:
                     print("\nEmail is required.")
                     continue
                 # Email format validation
-                elif not re.match(email_pattern, email):
-                    print("\nInvalid email format. Please try again.")
+                is_valid, error_msg = self.shop.validate_email_for_register(email)
+                if not is_valid:
+                    print(f"\n{error_msg}")
                     continue
                 break
             
@@ -112,8 +132,9 @@ class ShopCLI:
                 if not password:
                     print("\nPassword is required.")
                     continue
-                elif len(password) < 6:
-                    print("\nPassword must be at least 6 characters long.")
+                is_valid, error_msg = self.shop.validate_password(password)
+                if not is_valid:
+                    print(f"\n{error_msg}")
                     continue
                 break
             
@@ -128,34 +149,12 @@ class ShopCLI:
                     continue
                 break
                 
-            # Check if email already exists
-            if self.shop.find_customer_by_email(email):
-                print("Email already registered. Please use a different email.")
-                return
-            
-            # Generate new user ID
-            existing_ids = []
-            for customer in self.shop.customers:
-                if isinstance(customer.user_id, str) and customer.user_id.startswith('U'):
-                    try:
-                        num_part = int(customer.user_id[1:])
-                        existing_ids.append(num_part)
-                    except ValueError:
-                        continue
-                    
-            next_id_num = max(existing_ids, default=0) + 1
-            user_id = f"U{next_id_num:03d}"
-            
-            # Create new customer
-            new_customer = Customer(user_id, name, email, password, address)
-            self.shop.register_customer(new_customer)
-            
-            print("Registration successful! You can now login.")
+            return (name, email, password, address)
             
         except Exception as e:
-            print(f"Registration failed: {e}")
+            print(f"\nError collecting registration data: {e}")
+            return None
             
-
     def customer_menu(self):
         while True:
             print(f"\n--- Welcome, {self.current_customer.name}! ---")
@@ -184,9 +183,7 @@ class ShopCLI:
             elif choice == "7":
                 self.request_refund()
             elif choice == "8":
-                print("Logging out...")
-                self.current_customer = None
-                self.cart.clear()
+                self.logout()
                 break
             else:
                 print("\nInvalid choice. Please enter a number between 1 and 8.")
@@ -201,13 +198,14 @@ class ShopCLI:
             print("\nNo electronic products available")
             return
         
+        self.display_products(products)
+        self.add_to_cart_prompt(products)
+        
+    def display_products(self, products):
         for product in products:
             print(product)
             print("-" * 50)
-            
-        self.add_to_cart_prompt(products)
-        
-            
+                    
     # Search for products
     def search_products(self):
         print("\n--- Search Products ---")
@@ -229,10 +227,7 @@ class ShopCLI:
                 print("No products found matching your search.")
             else: 
                 print(f"\nFound {len(products)} product(s):")
-                for product in products:
-                    print(product)
-                    print("-" * 50)
-                    
+                self.display_products(products)
                 self.add_to_cart_prompt(products)
                 print("\n--- Search again or type 'exit' to leave ---\n")
                 
@@ -242,7 +237,7 @@ class ShopCLI:
         print("\n--- Browse products by Category ---")
         
         # Get all categories
-        categories = list(set(p.category for p in self.shop.products))
+        categories = self.shop.get_product_categories()
         
         if not categories:
             print("\nCategories not available.")
@@ -271,7 +266,7 @@ class ShopCLI:
             else: 
                 print("Invalid selection.")
         except ValueError:
-            print("Invalid input. Please enter a valid Product ID.")
+            print("Invalid input. Please enter a number.")
             
     
     def add_to_cart_prompt(self, allowed_products = None):
@@ -280,78 +275,53 @@ class ShopCLI:
             if choice == 'n':
                 break
             elif choice == 'y':
-                self.add_multiple_products_to_cart(allowed_products)
+                self.add_to_cart(allowed_products)
                 break
             else:
                 print("\nPlease enter 'y' or 'n'.")
-                
-                
-    def add_multiple_products_to_cart(self, allowed_products):
-        while True:
-            self.add_to_cart(allowed_products)
-            again = input("\nWould you like to add another product? (y/n): ").strip().lower()
-            if again == 'y':
-                continue
-            elif again == 'n':
-                break
-            else:
-                print("\nInvalid input. Returning to main menu.")
-                break
             
     def add_to_cart(self, allowed_products = None):
         while True:
-            try: 
-                product_id_input = input("\nPlease enter Product ID to add to cart (or type 'exit' to cancel): ").strip()
-                if product_id_input.lower() == 'exit':
-                    print("\nAdd item to cart cancelled.")
-                    return
+            product_id_input = input("\nPlease enter Product ID to add to cart (or type 'exit' to cancel): ").strip()
+            if product_id_input.lower() == 'exit':
+                print("\nAdd item to cart cancelled.")
+                return
                
-                product_id = product_id_input.upper()
-                product = self.shop.find_product_by_id(product_id)
+            product_id = product_id_input.upper()
+            product = self.shop.find_product_by_id(product_id)
                 
-                if not product:
-                    print("\nProduct not found. Please try again.")
-                    continue
+            if not product:
+                print("\nProduct not found. Please try again.")
+                continue
                 
-                if allowed_products and not any(p.product_id == product.product_id for p in allowed_products):
-                    print("\nProduct not available in this view. Please select a valid product.")
-                    continue
-                
-                while True:
-                    quantity_input = input(f"\nEnter quantity for '{product.name}' (stock: {product.stock}) (or type 'exit' to cancel): ").strip()
+            if allowed_products and not any(p.product_id == product.product_id for p in allowed_products):
+                print("\nProduct not available in this view. Please select a valid product.")
+                continue
+            
+            try:
+                quantity_input = input(f"\nEnter quantity for '{product.name}' (stock: {product.stock}) (or type 'exit' to cancel): ").strip()
                     
-                    if quantity_input.lower() == 'exit':
-                        print(f"\nAdd {product.name} to cart cancelled")
-                        return
-                    
-                    try:
-                        quantity = int(quantity_input)
-                    except ValueError:
-                        print("\nInvalid quantity. Please enter a valid number.")
-                        continue
-                        
-                    if quantity <= 0:
-                        print("\nQuantity must be greater than 0.")
-                        continue
-                        
-                    if quantity > product.stock:
-                        print(f"\nSorry, only {product.stock} items available in stock.")
-                        continue
-                    
-                    existing_quantity = self.cart.items.get(product, 0)
-                    total_quantity = existing_quantity + quantity
-                        
-                    if total_quantity > product.stock:
-                        print(f"\nSorry, you already have {existing_quantity} in your cart.")
-                        print(f"Adding {quantity} would exceed stock. Only {product.stock - existing_quantity} more available.")
-                        continue
-                        
-                    self.cart.add_product(product, quantity)
-                    print(f"\nAdded {product.name} x {quantity} to cart.")
+                if quantity_input.lower() == 'exit':
+                    print(f"\nAdd {product.name} to cart cancelled")
                     return
+                    
+                quantity = int(quantity_input)
+                    
+                self.cart.add_product(product, quantity)
+                print(f"\nAdded {product.name} x {quantity} to cart.")
+                    
+                again = input("\nWould you like to add another product? (y/n): ").strip().lower()
+                if again == 'n':
+                    print("\nReturn to menu...")
+                    break
+                elif again == 'y':
+                    continue
+                else:
+                    print("\nPlease enter 'y' or 'n'.")
                 
-            except ValueError:
-                print("\nInvalid input. Please enter a valid number.")
+            except ValueError as e:
+                print(f"\nFailed to add product: {e}")
+                
                 
             
     """ 
@@ -362,19 +332,14 @@ class ShopCLI:
 
         while True:
             print("\n--- Your Shopping Cart ---")
-            if not self.cart.items:
+            if self.cart.is_empty():
                 print("Your cart is empty.")
                 return
         
-            total = 0
-            for product, quantity in self.cart.items.items():
-                subtotal = product.price * quantity
-                total += subtotal
-                print(f"\n{product.name} \n- Quantity: {quantity} \n- ${product.price:.2f} each \n- Subtotal: ${subtotal:.2f}")
-                
-            print(f"\nTotal: ${total:.2f}\n")
+            summary = self.cart.get_cart_summary()
+            self.display_cart_summary(summary)
         
-            print("Cart Options:")
+            print("\nCart Options:")
             print("1. Update Quantity")
             print("2. Remove Item")
             print("3. Clear Cart")
@@ -398,138 +363,112 @@ class ShopCLI:
             else: 
                 print("Invalid choice. Please enter a number between 1 and 5.")
                 
-                
+    def display_cart_summary(self, summary):
+        """Helper method to display cart summary - Pure UI"""
+        for item in summary['items']:
+            print(f"\n{item['name']}")
+            print(f"- Quantity: {item['quantity']}")
+            print(f"- ${item['price']:.2f} each")
+            print(f"- Subtotal: ${item['subtotal']:.2f}")
+        
+        print(f"\nTotal: ${summary['total']:.2f}")
+        print(f"Items: {summary['item_count']}")
+        
     def update_cart_quantity(self):
-        if not self.cart.items:
-            print("Cart is empty.")
+        if self.cart.is_empty():
             return
-
+        
         products = list(self.cart.items.keys())
         
-        print("\n--- Update Cart Quantity ---")
+        print("\n--- Update Quantity ---")
         for i, product in enumerate(products, 1):
-            print(f"{i}. {product.name} (Current quantity: {self.cart.items[product]})")
-
+            current_qty = self.cart.items[product]
+            print(f"{i}. {product.name} (Current: {current_qty})")
+        
         while True:
-
             try:
-                choice_input = input("Select item to update (or type 'exit' to cancel): ").strip()
+                choice_input = input("\nSelect item to update (or type 'exit' to cancel): ").strip()
 
                 if choice_input.lower() == "exit":
-                    print("\nUpdating cancelled.")
+                    print("\nUpdating cancelled. Returning to cart...")
                     break
                 
                 choice = int(choice_input)
-
                 if 1 <= choice <= len(products):
                     product = products[choice - 1]
-
-                    while True:
-                        try:
-                            new_quantity_input = input("\nEnter new quantity (or type 'exit' to cancel): ").strip()
-                            if new_quantity_input.lower() == 'exit':
-                                print("\nUpdating quantity cancelled.")
-                                return
-                            
-                            new_quantity = int(new_quantity_input)
-                
-                
-                            if new_quantity == 0:
-                                self.cart.remove_product(product)
-                                print(f"\n'{product.name}' removed from cart.")
-                                break
-                            elif new_quantity > 0:
-                                if new_quantity > product.stock:
-                                    print(f"\nSorry, only {product.stock} in stock right now.")
-                                else:
-                                    self.cart.update_quantity(product, new_quantity)
-                                    print("\nQuantity updated. Returning to cart...")
-                                    break 
-                            else:
-                                print("\nInvalid quantity. Must be 0 or more.\n")
-                        except ValueError:
-                            print("\nInvalid input. Please enter a number.")
-
-                    break
+                    
+                    new_quantity_input = input("\nEnter new quantity (or type 'exit' to cancel): ").strip()
+                    if new_quantity_input.lower() == 'exit':
+                        print("\nUpdating cancelled. Returning to cart...")
+                        return
+                        
+                    new_quantity = int(new_quantity_input)
+                    
+                    try:
+                        if new_quantity == 0:
+                            self.cart.remove_product(product)
+                            print(f"\n'{product.name}' removed from cart.")
+                            break
+                        else:
+                            self.cart.update_quantity(product, new_quantity)
+                            print("\nQuantity updated.")
+                    except ValueError as e:
+                        print(f"\nUpdate failed: {e}")
                 else:
-                    print("\nInvalid selection.\n")
+                    print("\nInvalid selection.")
             except ValueError:
-                print("\nInvalid input. Please enter a valid number.\n")
+                print("\nInvalid input. Please enter a number.")
                 
     def remove_from_cart(self):
-        if not self.cart.items:
-            print("Cart is empty.")
-            return
-        
+    
         while True:
+            if self.cart.is_empty():
+                return
+        
+            products = list(self.cart.items.keys())
+        
+            print("\n--- Remove Item ---")
+            print("\nProducts in cart:")
+            for i, product in enumerate(products, 1):
+                print(f"{i}. {product.name}")
+            
             try:
-                print("\nProducts in cart:")
-                for i, (product, quantity) in enumerate(self.cart.items.items(), 1):
-                    print(f"{i}. {product.name} - Quantity: {quantity}")
-                
                 choice_input = input("\nSelect product number to remove (or type 'exit' to exit): ").strip()
                 if choice_input.lower() == "exit":
                     print("\nReturn to shopping cart.")
                     return
                 
                 choice = int(choice_input)
-                products = list(self.cart.items.keys())
                 
                 if 1 <= choice <= len(products):
                     product = products[choice - 1]
                     self.cart.remove_product(product)
                     print(f"\nRemoved {product.name} from cart.")
-                    
-                    if not self.cart.items:
-                        print("\nCart is now empty.")
-                        return
+                    continue
                 else:
                     print("\nInvalid selection.")
                     continue
             except ValueError:
                 print("\nInvalid input. Please enter a number.")
-                
+                    
                 
     # ----------------Checkout Order ---------------
     def checkout(self):
         """Handle the checkout process including payment method selection"""
         # Check if cart is empty
-        if not self.cart.items:
+        if self.cart.is_empty(): 
             print("Your cart is empty. Nothing to checkout.")
             return
         
-        # Display available payment methods
-        payment_methods = ["Credit Card", "PayPal", "Bank Transfer", "Cash on Delivery"]
-        print("\n--- Available Payment Methods ---")
-        for i, method in enumerate(payment_methods, 1):
-            print(f"{i}. {method}")
-        
         # Get payment method selection
-        payment_method = None
-        while payment_method is None:
-            try:
-                choice = input("\nSelect payment method (1-4): ").strip()
-                if choice.lower() == 'exit':
-                    print("Checkout cancelled.")
-                    return
-                    
-                choice_num = int(choice)
-                if 1 <= choice_num <= len(payment_methods):
-                    payment_method = payment_methods[choice_num-1]
-                else:
-                    print(f"Please enter a number between 1 and {len(payment_methods)}")
-            except ValueError:
-                print("Invalid input. Please enter a number.")
+        payment_method = self.get_payment_method()
+       
+        if not payment_method:
+            print("Checkout cancelled.")
+            return
         
-        # Display cart summary
-        total = sum(product.price * qty for product, qty in self.cart.items.items())
-        print("\n--- Order Summary ---")
-        print("Items in your cart:")
-        for product, qty in self.cart.items.items():
-            print(f"- {product.name} x {qty}: ${product.price * qty:.2f}")
-        print(f"\nTotal: ${total:.2f}")
-        print(f"Shipping to: {self.current_customer.address}")
-        print(f"Payment Method: {payment_method}")
+        # Display checkout summary
+        self.display_checkout_summary(payment_method)
         
         # Get final confirmation
         confirm = input("\nConfirm checkout? (y/n): ").strip().lower()
@@ -545,47 +484,126 @@ class ShopCLI:
                 payment_method=payment_method
             )
             
-            if order:
-                if order.status == "Confirmed":
-                    print("\n✅ Order confirmed! Thank you for your purchase.")
-                    print(f"Order ID: {order.order_id}")
-                    print(f"Payment ID: {order.payment.payment_id}")
-                    print(f"Tracking Number: {order.delivery.tracking_number}")
-                    print(f"Estimated Delivery: {order.delivery.estimated_delivery.strftime('%Y-%m-%d')}")
-                elif order.status == "Payment Failed":
-                    print("\n❌ Payment failed. Please try a different payment method.")
-                    # Keep items in cart for retry
-                else:
-                    print(f"\nOrder status: {order.status}")
-            else:
-                print("\nFailed to place order. Please try again.")
+            # Display result
+            self.display_order_result(order)
+            
         except Exception as e:
             print(f"\nError during checkout: {str(e)}")
             # Keep items in cart for retry
             print("Your items have been kept in the cart for your next attempt.")
-    
+
+    def get_payment_method(self):
+        # Display available payment methods
+        payment_methods = ["Credit Card", "PayPal", "Bank Transfer", "Cash on Delivery"]
+        print("\n--- Available Payment Methods ---")
+        for i, method in enumerate(payment_methods, 1):
+            print(f"{i}. {method}")
+            
+        while True:
+            try:
+                choice = input("\nSelect payment method (1-4): ").strip()
+                if choice.lower() == 'exit':
+                    return None
+                    
+                choice_num = int(choice)
+                if 1 <= choice_num <= len(payment_methods):
+                    return payment_methods[choice_num-1]
+                else:
+                    print(f"Please enter a number between 1 and {len(payment_methods)}")
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+                
+    def display_checkout_summary(self, payment_method):
+        # Display cart summary
+        summary = self.cart.get_cart_summary()
+        print("\n--- Order Summary ---")
+        print("Items in your cart:")
+        for item in summary['items']:
+            print(f"- {item['name']} x {item['quantity']}: ${item['subtotal']:.2f}")
+        print(f"\nTotal: ${summary['total']:.2f}")
+        print(f"Shipping to: {self.current_customer.address}")
+        print(f"Payment Method: {payment_method}")
+        
+        
+    def display_order_result(self, order):
+        if order:
+            if order.status == "Confirmed":
+                print("\n✅ Order confirmed! Thank you for your purchase.")
+                print(f"Order ID: {order.order_id}")
+                print(f"Payment ID: {order.payment.payment_id}")
+                print(f"Tracking Number: {order.delivery.tracking_number}")
+                print(f"Estimated Delivery: {order.delivery.estimated_delivery.strftime('%Y-%m-%d')}")
+            elif order.status == "Payment Failed":
+                print("\n❌ Payment failed. Please try a different payment method.")
+                    # Keep items in cart for retry
+            else:
+                print(f"\nOrder status: {order.status}")
+        else:
+            print("\nFailed to place order. Please try again.")
+            
     def update_profile(self):
         print("\n--- Update Profile ---")
         print("Leave blank to keep current value.")
         
-        name = input(f"\nName [{self.current_customer.name}]: ").strip()
+        # Get input from user
+        profile_data = self.get_profile_update_data()
+        
+        success, message = self.shop.update_customer_profile(self.current_customer, profile_data)
+        if success:
+            print("\nProfile updated successfully!")
+        else:
+            print(f"\nProfile update failed: {message}")
+            
+            
+    def get_profile_update_data(self):
+        while True:
+            name = input(f"\nName [{self.current_customer.name}]: ").strip()
+            if not name:
+                name = None
+                break
+            
+            is_valid, error_msg = self.shop.validate_name(name)
+            if not is_valid:
+                print(f"\n{error_msg}")
+                continue
+            break
+                
         while True:
             email = input(f"\nEmail [{self.current_customer.email}]: ").strip()
-            if email:
-                existing_customer = self.shop.find_customer_by_email(email)
-                if existing_customer and existing_customer.user_id != self.current_customer.user_id:
-                    print("\nEmail already taken by another customer. Try again or leave blank to keep current.")
-                    continue
+            if not email:
+                email = None
+                break
+            
+            is_valid, error_msg = self.shop.validate_email_for_update(email, self.current_customer.user_id)
+            if not is_valid:
+                print(f"\n{error_msg}")
+                continue
             break
 
-        password = input("\nNew Password (leave blank to keep current): ").strip()
-        address = input(f"\nAddress [{self.current_customer.address}]: ").strip()
+        while True:
+            password = input("\nNew Password (leave blank to keep current): ").strip()
+            if not password:
+                password = None
+                break
+            is_valid, error_msg = self.shop.validate_password(password)
+            if not is_valid:
+                print(f"\n{error_msg}")
+                continue
+            break
+            
+        while True:
+            address = input(f"\nAddress [{self.current_customer.address}]: ").strip()
+            if not address: 
+                address = None
+                break
+            break
         
-        self.current_customer.update_profile(name, email, password)
-        if address:
-            self.current_customer.update_address(address)
-
-        print("\nProfile updated successfully!")
+        return {
+            'name': name or None,
+            'email': email or None, 
+            'password': password or None,
+            'address': address or None
+        }
         
         
     def view_order_history(self):
@@ -598,3 +616,10 @@ class ShopCLI:
         for order in orders:
             print(order)
             print("-" * 50)
+            
+    
+    def logout(self):
+        print("Logging out...")
+        self.current_customer = None
+        self.cart.clear() 
+        
