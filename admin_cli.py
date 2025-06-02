@@ -16,7 +16,8 @@ class AdminCLI:
             print("2. View Customer Orders")
             print("3. Generate Sales Report")
             print("4. Manage Deliveries")
-            print("5. Logout")
+            print("5. Approve Refund Requests")
+            print("6. Logout")
             choice = input("Select an option: ").strip()
 
             if choice == "1":
@@ -28,11 +29,13 @@ class AdminCLI:
             elif choice == "4":
                 self.manage_deliveries() 
             elif choice == "5":
+                self.approve_refund_requests()
+            elif choice == "6":
                 print("Logging out of admin account.")
                 self.current_admin = None
                 break
             else:
-                print("Invalid choice. Please enter 1-4.")
+                print("Invalid choice. Please enter a number between 1 and 6.")
 
     def login(self):
         print("\n--- Admin Login ---")
@@ -387,6 +390,59 @@ class AdminCLI:
                 print("Invalid selection.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-                
+   
+    def approve_refund_requests(self):
+        print("\n--- Approve Refund Requests ---")
+        refund_requests = [o for o in self.shop.orders if o.status == "Refunded"]
+
+        if not refund_requests:
+            print("No refund requests pending approval.")
+            return
+
+        for idx, order in enumerate(refund_requests, 1):
+            print(f"\n{idx}. Order ID: {order.order_id}")
+            print(f"   Customer: {order.customer.get('name')} ({order.customer.get('email')})")
+            print(f"   Total Amount: ${order.total_price:.2f}")
+            print(f"   Payment Status: {order.payment.status if order.payment else 'N/A'}")
+            print("   Items:")
+            for item in order.items:
+                print(f"     - {item['product_id']} x {item['quantity']}")
+
+        choice = input("\nEnter the number or Order ID to approve (or 'exit' to cancel): ").strip()
+
+        if choice.lower() == "exit":
+            print("Refund approval cancelled.")
+            return
+
+        selected_order = None
+
+        try:
+            index = int(choice) - 1
+            if 0 <= index < len(refund_requests):
+                selected_order = refund_requests[index]
+        except ValueError:
+            pass
+
+        if not selected_order:
+            for order in refund_requests:
+                if order.order_id.lower() == choice.lower():
+                    selected_order = order
+                    break
+
+        if not selected_order:
+            print("Invalid selection. Please enter a valid number or Order ID.")
+            return
+
+        confirm = input(f"Approve refund for Order ID {selected_order.order_id}? (y/n): ").strip().lower()
+        if confirm == 'y':
+            selected_order.status = "Refund Approved"
+            if selected_order.payment:
+                selected_order.payment.status = "Refund Approved"
+            self.shop.save_data()
+            print(f"Refund approved for Order ID: {selected_order.order_id}")
+        else:
+            print("Refund not approved.")
+        
+
                 
         

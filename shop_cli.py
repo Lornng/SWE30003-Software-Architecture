@@ -183,8 +183,7 @@ class ShopCLI:
             elif choice == "7":
                 self.request_refund()
             elif choice == "8":
-                print(f"Logging out of {self.current_customer.name} account.")
-                self.current_customer = None
+                self.logout()
                 break
             else:
                 print("\nInvalid choice. Please enter a number between 1 and 8.")
@@ -529,13 +528,13 @@ class ShopCLI:
     def display_order_result(self, order):
         if order:
             if order.status == "Confirmed":
-                print("\n✅ Order confirmed! Thank you for your purchase.")
+                print("\nOrder confirmed! Thank you for your purchase.")
                 print(f"Order ID: {order.order_id}")
                 print(f"Payment ID: {order.payment.payment_id}")
                 print(f"Tracking Number: {order.delivery.tracking_number}")
                 print(f"Estimated Delivery: {order.delivery.estimated_delivery.strftime('%Y-%m-%d')}")
             elif order.status == "Payment Failed":
-                print("\n❌ Payment failed. Please try a different payment method.")
+                print("\nPayment failed. Please try a different payment method.")
                     # Keep items in cart for retry
             else:
                 print(f"\nOrder status: {order.status}")
@@ -624,7 +623,7 @@ class ShopCLI:
         print("\n--- Request Refund ---")
         orders = self.shop.list_orders_by_customer(self.current_customer)
 
-        eligible_orders = [o for o in orders if o.status not in ("Refunded", "Cancelled")]
+        eligible_orders = [o for o in orders if o.status not in ("Refunded", "Cancelled", "Pending Refund")]
         if not eligible_orders:
             print("No orders eligible for refund.")
             return
@@ -642,10 +641,8 @@ class ShopCLI:
             idx = int(choice) - 1
             if 0 <= idx < len(eligible_orders):
                 order = eligible_orders[idx]
-                order.update_status("Refunded")
-                if order.payment:
-                    order.payment.status = "Refunded"
-                print(f"✅ Refund processed for Order ID: {order.order_id}")
+                order.update_status("Pending Refund")
+                print(f"Refund request submitted for Order ID: {order.order_id}. Awaiting admin approval.")
                 self.shop.save_data()
             else:
                 print("Invalid selection.")
