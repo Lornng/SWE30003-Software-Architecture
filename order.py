@@ -96,7 +96,7 @@ class Order:
 
     def update_status(self, new_status):
         """Update order status with validation"""
-        valid_statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Refunded"]
+        valid_statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Refunded", "Pending Refund", "Refund Pending"]
         if new_status in valid_statuses:
             self.status = new_status
             return True
