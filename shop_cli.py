@@ -642,7 +642,7 @@ class ShopCLI:
             idx = int(choice) - 1
             if 0 <= idx < len(eligible_orders):
                 order = eligible_orders[idx]
-                order.set_refund_status("Refund Pending")
+                order.update_status("Pending Refund")
                 print(f"Refund request submitted for Order ID: {order.order_id}. Awaiting admin approval.")
                 self.shop.save_data()
             else:

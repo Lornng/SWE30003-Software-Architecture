@@ -102,10 +102,3 @@ class Order:
             return True
         print(f"Invalid status. Valid options: {', '.join(valid_statuses)}")
         return False
-    
-    def set_refund_status(self, new_status):
-        refund_statuses = ["Refund Pending", "Refund Approved"]
-        if new_status in refund_statuses:
-            self.status = new_status
-            return True
-        return False  # No print or error output

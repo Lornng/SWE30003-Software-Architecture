@@ -393,7 +393,7 @@ class AdminCLI:
    
     def approve_refund_requests(self):
         print("\n--- Approve Refund Requests ---")
-        refund_requests = [o for o in self.shop.orders if o.status == "Refunded"]
+        refund_requests = [o for o in self.shop.orders if o.status in ("Pending Refund", "Refund Pending")]
 
         if not refund_requests:
             print("No refund requests pending approval.")
