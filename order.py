@@ -94,7 +94,7 @@ class Order:
                     f"Est. Delivery: {est_delivery.strftime('%Y-%m-%d')}\n")
         return "Delivery: Not scheduled\n"
 
-    def update_status(self, new_status):
+    def update_status(self, new_status, silent=False):
         """Update order status with validation"""
         valid_statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Refunded", "Pending Refund", "Refund Pending"]
         if new_status in valid_statuses:
