@@ -183,7 +183,8 @@ class ShopCLI:
             elif choice == "7":
                 self.request_refund()
             elif choice == "8":
-                self.logout()
+                print(f"Logging out of {self.current_customer.name} account .")
+                self.current_customer = None
                 break
             else:
                 print("\nInvalid choice. Please enter a number between 1 and 8.")
