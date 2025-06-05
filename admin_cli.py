@@ -1,4 +1,6 @@
 from product import Product
+from collections import Counter
+from datetime import datetime, timedelta
 
 class AdminCLI:
     def __init__(self, shop):
@@ -241,7 +243,6 @@ class AdminCLI:
 
     def generate_sales_report(self):
         print("\n--- Sales Report ---")
-        from datetime import datetime
         start_date_str = input("Enter start date (YYYY-MM-DD): ").strip()
         end_date_str = input("Enter end date (YYYY-MM-DD): ").strip()
         try:
@@ -251,6 +252,33 @@ class AdminCLI:
             total_sales = sum(o.total_price for o in orders)
             print(f"Total orders: {len(orders)}")
             print(f"Total sales: ${total_sales:.2f}")
+
+            # --- Best-Selling Product ---
+            product_counter = Counter()
+            for order in orders:
+                for item in order.items:
+                    product_counter[item['product_id']] += item['quantity']
+
+            if product_counter:
+                best_pid, best_qty = product_counter.most_common(1)[0]
+                # Assuming self.shop.products is a dict: id -> Product
+                best_name = self.shop.products[best_pid].name if best_pid in self.shop.products else best_pid
+                print(f"Best-Selling Product: {best_name} ({best_qty} units sold)")
+            else:
+                print("No products sold in this period.")
+
+            # --- Weekly Sales Trend ---
+            print("Weekly Sales Trend:")
+            week_start = start_date
+            while week_start <= end_date:
+                week_end = min(week_start + timedelta(days=6), end_date)
+                week_total = sum(
+                    o.total_price for o in orders
+                    if week_start <= o.order_date <= week_end
+                )
+                print(f"  {week_start.strftime('%Y-%m-%d')} to {week_end.strftime('%Y-%m-%d')}: ${week_total:.2f}")
+                week_start = week_end + timedelta(days=1)
+
         except ValueError:
             print("Invalid date format.")
             
